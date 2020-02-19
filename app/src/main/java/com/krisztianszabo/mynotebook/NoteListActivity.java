@@ -43,16 +43,6 @@ public class NoteListActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//
-//        if (id == R.id.newNote) {
-//            // do something here
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
     @Override
     protected void onResume() {
         super.onResume();
