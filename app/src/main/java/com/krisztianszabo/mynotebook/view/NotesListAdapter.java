@@ -35,7 +35,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<ListElementViewHolder
     public void onBindViewHolder(@NonNull ListElementViewHolder holder, final int position) {
         final TextView deleteButton = holder.getDeleteButton();
         holder.getNoteTitle().setText(notes.get(position).getTitle());
-        deleteButton.setTag(notes.get(position).getId().toString());
+
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -44,6 +44,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<ListElementViewHolder
                 notifyDataSetChanged();
             }
         });
+
         holder.getRowLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,6 +53,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<ListElementViewHolder
                 v.getContext().startActivity(intent);
             }
         });
+
         holder.getRowLayout().setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
