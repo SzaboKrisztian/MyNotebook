@@ -2,10 +2,11 @@ package com.krisztianszabo.mynotebook;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
 
 import com.krisztianszabo.mynotebook.model.Note;
 import com.krisztianszabo.mynotebook.model.NoteDatabase;
@@ -31,30 +32,26 @@ public class NoteEditActivity extends AppCompatActivity {
             contentInput.setText(this.noteBeingEdited.getContent());
         } else {
             this.noteBeingEdited = new Note();
-            (findViewById(R.id.deleteButton)).setVisibility(View.GONE);
         }
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    // TODO: change the save into a back button (perhaps use the application bar's back?)
-    public void save(View view) {
-        this.noteBeingEdited.setTitle(titleInput.getText().toString());
-        this.noteBeingEdited.setContent(contentInput.getText().toString());
-        if (this.noteBeingEdited.isNew()) {
-            NoteDatabase.getDb(getApplicationContext()).noteDao().insert(this.noteBeingEdited);
-        } else {
-            NoteDatabase.getDb(getApplicationContext()).noteDao().update(this.noteBeingEdited);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.noteBeingEdited.setTitle(titleInput.getText().toString());
+                this.noteBeingEdited.setContent(contentInput.getText().toString());
+                if (this.noteBeingEdited.isNew()) {
+                    NoteDatabase.getDb(getApplicationContext()).noteDao().insert(this.noteBeingEdited);
+                } else {
+                    NoteDatabase.getDb(getApplicationContext()).noteDao().update(this.noteBeingEdited);
+                }
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        startActivity(new Intent(this, NoteListActivity.class));
-    }
-
-    // TODO: and then get rid of the back button
-    public void cancel(View view) {
-        startActivity(new Intent(this, NoteListActivity.class));
-    }
-
-    // TODO: implement the delete in the listview, by some different mechanism
-    public void delete(View view) {
-        NoteDatabase.getDb(getApplicationContext()).noteDao().delete(this.noteBeingEdited);
-        startActivity(new Intent(this, NoteListActivity.class));
     }
 }
