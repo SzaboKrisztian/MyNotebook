@@ -44,7 +44,12 @@ public class NoteEditActivity extends AppCompatActivity {
                 this.noteBeingEdited.setTitle(titleInput.getText().toString());
                 this.noteBeingEdited.setContent(contentInput.getText().toString());
                 if (this.noteBeingEdited.isNew()) {
-                    NoteDatabase.getDb(getApplicationContext()).noteDao().insert(this.noteBeingEdited);
+                    if (!(noteBeingEdited.getTitle().isEmpty() && noteBeingEdited.getContent().isEmpty())) {
+                        if (noteBeingEdited.getTitle().isEmpty()) {
+                            noteBeingEdited.setTitle("Untitled note");
+                        }
+                        NoteDatabase.getDb(getApplicationContext()).noteDao().insert(this.noteBeingEdited);
+                    }
                 } else {
                     NoteDatabase.getDb(getApplicationContext()).noteDao().update(this.noteBeingEdited);
                 }

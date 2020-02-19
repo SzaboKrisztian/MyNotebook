@@ -2,6 +2,8 @@ package com.krisztianszabo.mynotebook;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -36,6 +38,22 @@ public class NoteListActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.note_list_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//
+//        if (id == R.id.newNote) {
+//            // do something here
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -48,7 +66,7 @@ public class NoteListActivity extends AppCompatActivity {
         NoteDatabase.destroyInstance();
     }
 
-    public void newNote(View view) {
+    public void newNote(MenuItem menuItem) {
         startActivity(new Intent(this, NoteEditActivity.class));
     }
 }
