@@ -20,14 +20,16 @@ public class NoteListActivity extends AppCompatActivity {
 
     RecyclerView notesList;
     NotesListAdapter adapter;
+    NoteDao database;
+    List<Note> notes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        NoteDao dao = NoteDatabase.getDb(getApplicationContext()).noteDao();
+        database = NoteDatabase.getDb(getApplicationContext()).noteDao();
 
-        final List<Note> notes = dao.getAll();
+        notes = database.getAll();
 
         notesList = findViewById(R.id.notesList);
         notesList.setLayoutManager(new LinearLayoutManager(this));
@@ -44,7 +46,8 @@ public class NoteListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        notes.clear();
+        notes.addAll(database.getAll());
         adapter.notifyDataSetChanged();
     }
 

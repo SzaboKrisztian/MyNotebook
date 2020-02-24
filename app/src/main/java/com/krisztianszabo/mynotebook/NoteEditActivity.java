@@ -2,7 +2,9 @@ package com.krisztianszabo.mynotebook;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +12,8 @@ import androidx.core.app.NavUtils;
 
 import com.krisztianszabo.mynotebook.model.Note;
 import com.krisztianszabo.mynotebook.model.NoteDatabase;
+
+import java.util.zip.GZIPOutputStream;
 
 public class NoteEditActivity extends AppCompatActivity {
 
@@ -58,5 +62,26 @@ public class NoteEditActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.note_edit_menu, menu);
+        if (noteBeingEdited.isNew()) {
+            MenuItem deleteOption = menu.findItem(R.id.deleteMenu);
+            if (deleteOption != null) {
+                deleteOption.setVisible(false);
+            }
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    public void deleteNote(MenuItem menuItem) {
+        NoteDatabase.getDb(this).noteDao().delete(noteBeingEdited);
+        finish();
+    }
+
+    public void cancel(MenuItem menuItem) {
+        finish();
     }
 }
