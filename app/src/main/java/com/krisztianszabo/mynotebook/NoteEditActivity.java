@@ -57,7 +57,8 @@ public class NoteEditActivity extends AppCompatActivity {
                 } else {
                     NoteDatabase.getDb(getApplicationContext()).noteDao().update(this.noteBeingEdited);
                 }
-                NavUtils.navigateUpFromSameTask(this);
+//                NavUtils.navigateUpFromSameTask(this);
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

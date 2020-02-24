@@ -18,8 +18,10 @@ import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity {
 
+    int scrollPosition;
     RecyclerView notesList;
     NotesListAdapter adapter;
+    LinearLayoutManager layoutManager;
     NoteDao database;
     List<Note> notes;
 
@@ -32,7 +34,8 @@ public class NoteListActivity extends AppCompatActivity {
         notes = database.getAll();
 
         notesList = findViewById(R.id.notesList);
-        notesList.setLayoutManager(new LinearLayoutManager(this));
+        layoutManager = new LinearLayoutManager(this);
+        notesList.setLayoutManager(layoutManager);
         adapter = new NotesListAdapter(notes);
         notesList.setAdapter(adapter);
     }
@@ -49,6 +52,13 @@ public class NoteListActivity extends AppCompatActivity {
         notes.clear();
         notes.addAll(database.getAll());
         adapter.notifyDataSetChanged();
+        layoutManager.scrollToPosition(scrollPosition);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        scrollPosition = layoutManager.findFirstVisibleItemPosition();
     }
 
     @Override
