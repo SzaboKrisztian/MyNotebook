@@ -1,27 +1,55 @@
 package com.krisztianszabo.mynotebook.model;
 
-import android.content.Context;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
-import androidx.room.Database;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@Database(entities = {Note.class}, version = 2, exportSchema = false)
-public abstract class NoteDatabase extends RoomDatabase {
+public class NoteDatabase {
 
-    private static NoteDatabase instance;
-    public abstract NoteDao noteDao();
+    private FirebaseFirestore firestore;
+    private final String COL = "notes";
+    private static NoteDatabase instance = new NoteDatabase();
 
-    public static NoteDatabase getDb(Context context) {
-        if (instance == null) {
-            // TODO: get rid of .allowMainThreadQueries() and implement the DB access with worker threads
-            instance = Room.databaseBuilder(context.getApplicationContext(), NoteDatabase.class,
-                    "mynotebook").allowMainThreadQueries().build();
-        }
+    private NoteDatabase() {
+        this.firestore = FirebaseFirestore.getInstance();
+    }
+
+    public static NoteDatabase getInstance() {
         return instance;
     }
 
-    public static void destroyInstance() {
-        instance = null;
+    public void addOrUpdateNote(Note note) {
+        DocumentReference doc;
+        if (note.isNew()) {
+            doc = firestore.collection(COL).document();
+        } else {
+            doc = firestore.collection(COL).document(note.getId());
+        }
+
+        Map<String, String> map = new HashMap<>();
+        map.put("title", note.getTitle());
+        map.put("content", note.getContent());
+
+        doc.set(map);
+    }
+
+    public void deleteNote(Note note) {
+        DocumentReference doc = firestore.collection(COL).document(note.getId());
+        doc.delete();
+    }
+
+    public Note parseNote(DocumentSnapshot doc) {
+        Note result = new Note();
+        result.setId(doc.getId());
+        result.setTitle(doc.get("title").toString());
+        result.setContent(doc.get("content").toString());
+        return result;
     }
 }

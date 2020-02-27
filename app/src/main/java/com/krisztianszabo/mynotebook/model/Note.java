@@ -10,7 +10,7 @@ import java.io.Serializable;
 // TODO: get rid of Serializable and implement Android's Parcelable
 public class Note implements Serializable {
     @PrimaryKey
-    private Integer id;
+    private String id;
 
     @ColumnInfo(name = "title")
     private String title;
@@ -18,11 +18,11 @@ public class Note implements Serializable {
     @ColumnInfo(name = "content")
     private String content;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

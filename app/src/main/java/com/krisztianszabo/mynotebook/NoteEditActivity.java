@@ -4,16 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NavUtils;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.krisztianszabo.mynotebook.model.Note;
 import com.krisztianszabo.mynotebook.model.NoteDatabase;
-
-import java.util.zip.GZIPOutputStream;
 
 public class NoteEditActivity extends AppCompatActivity {
 
@@ -21,6 +18,7 @@ public class NoteEditActivity extends AppCompatActivity {
     private Note noteBeingEdited;
     private TextView titleInput;
     private TextView contentInput;
+    private NoteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +26,7 @@ public class NoteEditActivity extends AppCompatActivity {
         setContentView(R.layout.activity_note_edit);
         this.titleInput = findViewById(R.id.titleInput);
         this.contentInput = findViewById(R.id.contentInput);
+        this.db = NoteDatabase.getInstance();
 
         Intent intent = getIntent();
         if (intent.hasExtra(NOTE_KEY)) {
@@ -52,10 +51,10 @@ public class NoteEditActivity extends AppCompatActivity {
                         if (noteBeingEdited.getTitle().isEmpty()) {
                             noteBeingEdited.setTitle("Untitled note");
                         }
-                        NoteDatabase.getDb(getApplicationContext()).noteDao().insert(this.noteBeingEdited);
+                        db.addOrUpdateNote(this.noteBeingEdited);
                     }
                 } else {
-                    NoteDatabase.getDb(getApplicationContext()).noteDao().update(this.noteBeingEdited);
+                    db.addOrUpdateNote(this.noteBeingEdited);
                 }
 //                NavUtils.navigateUpFromSameTask(this);
                 finish();
@@ -78,7 +77,7 @@ public class NoteEditActivity extends AppCompatActivity {
     }
 
     public void deleteNote(MenuItem menuItem) {
-        NoteDatabase.getDb(this).noteDao().delete(noteBeingEdited);
+        db.deleteNote(noteBeingEdited);
         finish();
     }
 

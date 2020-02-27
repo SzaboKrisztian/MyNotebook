@@ -2,18 +2,26 @@ package com.krisztianszabo.mynotebook;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.krisztianszabo.mynotebook.model.Note;
-import com.krisztianszabo.mynotebook.model.NoteDao;
 import com.krisztianszabo.mynotebook.model.NoteDatabase;
 import com.krisztianszabo.mynotebook.view.NotesListAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity {
@@ -22,22 +30,23 @@ public class NoteListActivity extends AppCompatActivity {
     RecyclerView notesList;
     NotesListAdapter adapter;
     LinearLayoutManager layoutManager;
-    NoteDao database;
-    List<Note> notes;
+    NoteDatabase db;
+    List<Note> notes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        database = NoteDatabase.getDb(getApplicationContext()).noteDao();
+        db = NoteDatabase.getInstance();
 
-        notes = database.getAll();
 
         notesList = findViewById(R.id.notesList);
         layoutManager = new LinearLayoutManager(this);
         notesList.setLayoutManager(layoutManager);
         adapter = new NotesListAdapter(notes);
         notesList.setAdapter(adapter);
+
+        setDBChangeListener();
     }
 
     @Override
@@ -49,22 +58,27 @@ public class NoteListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        notes.clear();
-        notes.addAll(database.getAll());
-        adapter.notifyDataSetChanged();
+        setDBChangeListener();
         layoutManager.scrollToPosition(scrollPosition);
+    }
+
+    private void setDBChangeListener() {
+        FirebaseFirestore.getInstance().collection("notes").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                notes.clear();
+                for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    notes.add(NoteDatabase.getInstance().parseNote(doc));
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         scrollPosition = layoutManager.findFirstVisibleItemPosition();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        NoteDatabase.destroyInstance();
     }
 
     public void newNote(MenuItem menuItem) {

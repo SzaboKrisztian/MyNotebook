@@ -19,9 +19,11 @@ import java.util.List;
 public class NotesListAdapter extends RecyclerView.Adapter<ListElementViewHolder> {
 
     private List<Note> notes;
+    private NoteDatabase db;
 
     public NotesListAdapter(List<Note> notes) {
         this.notes = notes;
+        this.db = NoteDatabase.getInstance();
     }
 
     @NonNull
@@ -39,7 +41,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<ListElementViewHolder
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NoteDatabase.getDb(v.getContext()).noteDao().delete(notes.get(position));
+                db.deleteNote(notes.get(position));
                 notes.remove(position);
                 notifyDataSetChanged();
             }
