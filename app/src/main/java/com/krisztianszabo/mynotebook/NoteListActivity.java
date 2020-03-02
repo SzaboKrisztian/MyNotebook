@@ -26,12 +26,12 @@ import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity {
 
-    int scrollPosition;
-    RecyclerView notesList;
-    NotesListAdapter adapter;
-    LinearLayoutManager layoutManager;
-    NoteDatabase db;
-    List<Note> notes = new ArrayList<>();
+    private int scrollPosition;
+    private RecyclerView notesList;
+    private NotesListAdapter adapter;
+    private LinearLayoutManager layoutManager;
+    private NoteDatabase db;
+    private List<Note> notes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +39,12 @@ public class NoteListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         db = NoteDatabase.getInstance();
 
-
         notesList = findViewById(R.id.notesList);
         layoutManager = new LinearLayoutManager(this);
         notesList.setLayoutManager(layoutManager);
         adapter = new NotesListAdapter(notes);
         notesList.setAdapter(adapter);
-
-        setDBChangeListener();
+        db.setChangeListener(notes, adapter);
     }
 
     @Override
@@ -58,21 +56,7 @@ public class NoteListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setDBChangeListener();
         layoutManager.scrollToPosition(scrollPosition);
-    }
-
-    private void setDBChangeListener() {
-        FirebaseFirestore.getInstance().collection("notes").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                notes.clear();
-                for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                    notes.add(NoteDatabase.getInstance().parseNote(doc));
-                }
-                adapter.notifyDataSetChanged();
-            }
-        });
     }
 
     @Override

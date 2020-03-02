@@ -40,6 +40,7 @@ public class NoteEditActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    // TODO: Rewrite this method, it can be simplified
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -56,7 +57,6 @@ public class NoteEditActivity extends AppCompatActivity {
                 } else {
                     db.addOrUpdateNote(this.noteBeingEdited);
                 }
-//                NavUtils.navigateUpFromSameTask(this);
                 finish();
                 return true;
             default:

@@ -1,12 +1,15 @@
 package com.krisztianszabo.mynotebook.model;
 
-import com.google.android.gms.tasks.Task;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +26,19 @@ public class NoteDatabase {
 
     public static NoteDatabase getInstance() {
         return instance;
+    }
+
+    public void setChangeListener(final List<Note> notes, final RecyclerView.Adapter adapter) {
+        firestore.collection(COL).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                notes.clear();
+                for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    notes.add(NoteDatabase.parseNote(doc));
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void addOrUpdateNote(Note note) {
@@ -45,7 +61,7 @@ public class NoteDatabase {
         doc.delete();
     }
 
-    public Note parseNote(DocumentSnapshot doc) {
+    public static Note parseNote(DocumentSnapshot doc) {
         Note result = new Note();
         result.setId(doc.getId());
         result.setTitle(doc.get("title").toString());
